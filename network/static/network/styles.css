@@ -1,74 +1,327 @@
+/* Schoolyard Yellow Notepad Theme */
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+:root {
+    --notepad-yellow: #FEF9E7;
+    --notepad-yellow-darker: #FCF8E3;
+    --ruled-line: #B8D4E3;
+    --margin-red: #E63946;
+    --neobrutalist-yellow: #FFD60A;
+    --neobrutalist-orange: #FF9500;
+    --neobrutalist-red: #FF0050;
+    --neobrutalist-black: #000000;
+    --text-dark: #2C3E50;
+}
+
+/* Body with notepad background */
+body {
+    background: var(--notepad-yellow);
+    background-image: 
+        repeating-linear-gradient(
+            transparent,
+            transparent 24px,
+            var(--ruled-line) 24px,
+            var(--ruled-line) 25px
+        ),
+        linear-gradient(
+            to right,
+            transparent 0px,
+            transparent 40px,
+            var(--margin-red) 40px,
+            var(--margin-red) 42px,
+            transparent 42px
+        );
+    background-attachment: fixed;
+    font-family: 'Courier Prime', monospace;
+    color: var(--text-dark);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar styling */
+.navbar {
+    background: var(--notepad-yellow-darker) !important;
+    border-bottom: 4px solid var(--neobrutalist-black) !important;
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black);
+    margin-bottom: 30px;
+    padding: 15px 20px;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--text-dark) !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 700;
+    margin: 0 5px;
+    padding: 8px 15px !important;
+    border: 3px solid var(--neobrutalist-black);
+    background: var(--neobrutalist-yellow);
+    box-shadow: 4px 4px 0 0 var(--neobrutalist-black);
+    transition: all 0.1s ease;
+}
+
+.nav-link:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--neobrutalist-black);
+    background: var(--neobrutalist-orange);
+    color: var(--neobrutalist-black) !important;
+}
+
+.nav-link strong {
+    font-weight: 700;
+    color: inherit;
+}
+
+/* Neobrutalist Buttons */
+.btn {
+    border: 4px solid var(--neobrutalist-black) !important;
+    border-radius: 0 !important;
+    font-weight: 700 !important;
+    font-family: 'Courier Prime', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 20px !important;
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black);
+    transition: all 0.1s ease;
+    cursor: pointer;
+}
+
+.btn:hover {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0 0 var(--neobrutalist-black);
+}
+
+.btn:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0 0 0 0 var(--neobrutalist-black);
+}
+
+/* Primary buttons - Yellow */
+.btn-primary {
+    background: var(--neobrutalist-yellow) !important;
+    color: var(--neobrutalist-black) !important;
+    border-color: var(--neobrutalist-black) !important;
+}
+
+.btn-primary:hover {
+    background: var(--neobrutalist-orange) !important;
+    color: var(--neobrutalist-black) !important;
+}
+
+/* Outline primary - Orange */
+.btn-outline-primary {
+    background: transparent !important;
+    color: var(--neobrutalist-orange) !important;
+    border-color: var(--neobrutalist-orange) !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--neobrutalist-orange) !important;
+    color: var(--neobrutalist-black) !important;
+}
+
+/* Success buttons - Yellow */
+.btn-success {
+    background: var(--neobrutalist-yellow) !important;
+    color: var(--neobrutalist-black) !important;
+    border-color: var(--neobrutalist-black) !important;
+}
+
+.btn-success:hover {
+    background: var(--neobrutalist-orange) !important;
+}
+
+/* Danger buttons - Red */
+.btn-danger {
+    background: var(--neobrutalist-red) !important;
+    color: #FFFFFF !important;
+    border-color: var(--neobrutalist-black) !important;
+}
+
+.btn-danger:hover {
+    background: #FF3350 !important;
+    color: #FFFFFF !important;
+}
+
+/* Secondary buttons - Orange */
+.btn-secondary {
+    background: var(--neobrutalist-orange) !important;
+    color: var(--neobrutalist-black) !important;
+    border-color: var(--neobrutalist-black) !important;
+}
+
+.btn-secondary:hover {
+    background: #FFB300 !important;
+}
+
+/* Link buttons */
+.btn-link {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--neobrutalist-red) !important;
+    text-decoration: underline;
+    padding: 5px 10px !important;
+}
+
+.btn-link:hover {
+    transform: none;
+    color: var(--neobrutalist-orange) !important;
+    box-shadow: none !important;
+}
+
+/* Small buttons */
+.btn-sm {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    border-width: 3px !important;
+    box-shadow: 4px 4px 0 0 var(--neobrutalist-black) !important;
+}
+
+.btn-sm:hover {
+    box-shadow: 2px 2px 0 0 var(--neobrutalist-black) !important;
+}
+
+/* Container */
+.container {
+    width: 70%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    padding-left: 60px;
+    padding-right: 20px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Posts */
 .all-posts {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
 }
 
 .post {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
+    border: 3px solid var(--neobrutalist-black);
+    padding: 20px;
+    margin-top: 20px;
     position: relative;
+    background: var(--notepad-yellow-darker);
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black);
+    border-left: 6px solid var(--margin-red);
 }
 
 .post-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--neobrutalist-black);
 }
 
 .post-actions {
     display: flex;
-    gap: 5px;
+    gap: 8px;
 }
+
 .post-timestamp {
     font-size: 12px;
-    color: #666;
+    color: var(--text-dark);
+    font-style: italic;
 }
 
-.container {
-    width: 70%;
-    margin: 0 auto;
-    margin-bottom: 20px;
+.post-username {
+    font-weight: 700;
+    color: var(--neobrutalist-red);
+    text-decoration: none;
 }
+
+.post-username:hover {
+    color: var(--neobrutalist-orange);
+    text-decoration: underline;
+}
+
+.post-user {
+    margin-bottom: 10px;
+}
+
 .you-wrote {
     font-style: italic;
-    color: #445a64;
-    font-size: 12px;
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 700;
 }
 
-.post-form {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+.post-content {
+    margin: 15px 0;
+    line-height: 1.8;
+    font-size: 15px;
 }
 
-.form-header {
+.post-footer {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px solid var(--ruled-line);
+}
+
+.post-likes {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Form controls */
+.post-form {
+    border: 3px solid var(--neobrutalist-black);
+    padding: 20px;
+    margin-bottom: 30px;
+    background: var(--notepad-yellow-darker);
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black);
 }
 
 .form-control {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    padding: 12px;
+    border: 3px solid var(--neobrutalist-black) !important;
+    border-radius: 0 !important;
+    margin-bottom: 15px;
     margin-top: 10px;
+    background: var(--notepad-yellow) !important;
+    font-family: 'Courier Prime', monospace;
+    font-size: 14px;
+    box-shadow: inset 2px 2px 0 0 rgba(0, 0, 0, 0.1);
 }
 
+.form-control:focus {
+    outline: none;
+    border-color: var(--neobrutalist-orange) !important;
+    box-shadow: inset 2px 2px 0 0 rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(255, 149, 0, 0.2);
+}
+
+/* Following container */
 .following-container {
     width: 90%;
     margin: 0 auto;
     margin-bottom: 20px;
+    padding-left: 60px;
+    padding-right: 20px;
 }
 
 .following-container h1 {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dark);
+    text-shadow: 2px 2px 0 var(--neobrutalist-yellow);
 }
 
 .following-layout {
@@ -80,18 +333,23 @@
 
 .following-sidebar {
     flex: 0 0 250px;
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    border: 4px solid var(--neobrutalist-black);
+    padding: 20px;
+    background: var(--notepad-yellow-darker);
     height: fit-content;
     margin-top: 0;
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black);
 }
 
 .following-sidebar h3 {
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--neobrutalist-red);
+    border-bottom: 3px solid var(--neobrutalist-black);
+    padding-bottom: 10px;
 }
 
 .following-list {
@@ -101,8 +359,8 @@
 }
 
 .following-user {
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    border-bottom: 2px solid var(--ruled-line);
 }
 
 .following-user:last-child {
@@ -110,13 +368,14 @@
 }
 
 .following-username {
-    font-weight: 500;
-    color: #333;
+    font-weight: 700;
+    color: var(--text-dark);
     text-decoration: none;
 }
 
 .following-username:hover {
-    color: #007bff;
+    color: var(--neobrutalist-red);
+    text-decoration: underline;
 }
 
 .following-posts {
@@ -131,78 +390,197 @@
 .profile-info {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .followers-count,
 .following-count,
 .total-posts,
 .total-likes {
-    padding: 8px;
+    padding: 10px;
     font-size: 14px;
-    color: #333;
+    color: var(--text-dark);
+    font-weight: 700;
+    border: 2px solid var(--neobrutalist-black);
+    background: var(--neobrutalist-yellow);
+    box-shadow: 3px 3px 0 0 var(--neobrutalist-black);
 }
 
+/* Comments */
 .post-comment {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    padding: 5px;
-
+    border: 2px solid var(--neobrutalist-black);
+    border-radius: 0;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: var(--notepad-yellow);
+    box-shadow: 3px 3px 0 0 var(--neobrutalist-black);
 }
+
 .post-comment:last-child {
-    border-bottom: none;
+    border-bottom: 2px solid var(--neobrutalist-black);
 }
 
 .post-comment-user {
-    font-weight: 500;
-    color: #333;
+    font-weight: 700;
+    color: var(--neobrutalist-red);
+}
+
+.post-comment-content {
+    margin: 5px 0;
+    line-height: 1.6;
 }
 
 .post-comments-list {
-    margin-left: 10px;
+    margin-left: 15px;
+    margin-top: 15px;
 }
 
 .post-comments-toggle {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.comments-toggle-btn {
-    padding: 0;
-    font-size: 14px;
-    color: #666;
-    text-decoration: none;
-}
-
-.comments-toggle-btn:hover {
-    color: #007bff;
-    text-decoration: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid var(--ruled-line);
 }
 
 .post-comments {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid var(--ruled-line);
 }
 
 .no-comments {
     font-style: italic;
-    color: #999;
+    color: var(--text-dark);
     font-size: 14px;
     margin: 10px 0;
 }
 
+.post-comment-timestamp {
+    font-size: 11px;
+    color: var(--text-dark);
+    font-style: italic;
+}
+
+/* Pagination */
 .pagination {
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.page-link {
+    border: 3px solid var(--neobrutalist-black) !important;
+    color: var(--neobrutalist-black) !important;
+    background: var(--neobrutalist-yellow) !important;
+    padding: 10px 15px !important;
+    font-weight: 700;
+    font-family: 'Courier Prime', monospace;
+    box-shadow: 4px 4px 0 0 var(--neobrutalist-black);
+    margin: 0 5px;
+}
+
+.page-link:hover {
+    background: var(--neobrutalist-orange) !important;
+    color: var(--neobrutalist-black) !important;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--neobrutalist-black);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 4px solid var(--neobrutalist-black);
+    display: inline-block;
+}
+
+/* Links */
+a {
+    color: var(--neobrutalist-red);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+a:hover {
+    color: var(--neobrutalist-orange);
+    text-decoration: underline;
+}
+
+/* Messages */
+.alert, div[class*="message"] {
+    border: 3px solid var(--neobrutalist-black) !important;
+    border-radius: 0 !important;
+    padding: 15px !important;
+    background: var(--neobrutalist-yellow) !important;
+    color: var(--neobrutalist-black) !important;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 0 var(--neobrutalist-black);
     margin-bottom: 20px;
 }
 
-.post-comment-timestamp {
-    font-size: 12px;
-    color: #666;
+/* Body wrapper */
+.body {
+    padding-top: 20px;
+    padding-bottom: 40px;
 }
+
+/* Form groups */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Empty state messages */
+p:empty,
+.no-posts {
+    font-style: italic;
+    color: var(--text-dark);
+    padding: 20px;
+    text-align: center;
+    border: 2px dashed var(--neobrutalist-black);
+    background: var(--notepad-yellow-darker);
+    margin: 20px 0;
+}
+
+/* Ensure proper spacing for post forms */
+.post-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Disabled button state */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 6px 6px 0 0 var(--neobrutalist-black) !important;
+}
+
+/* Strong text */
+strong {
+    font-weight: 700;
+}
+
+/* Navbar list styling */
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-item {
+    list-style: none;
+}
+
+.all-posts-title {
+    margin-top: 20px;
