@@ -1,0 +1,208 @@
+.all-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    position: relative;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.post-actions {
+    display: flex;
+    gap: 5px;
+}
+.post-timestamp {
+    font-size: 12px;
+    color: #666;
+}
+
+.container {
+    width: 70%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+.you-wrote {
+    font-style: italic;
+    color: #445a64;
+    font-size: 12px;
+}
+
+.post-form {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.form-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.following-container {
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+.following-container h1 {
+    margin-bottom: 15px;
+}
+
+.following-layout {
+    display: flex;
+    gap: 20px;
+    margin-top: 0;
+    align-items: flex-start;
+}
+
+.following-sidebar {
+    flex: 0 0 250px;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    height: fit-content;
+    margin-top: 0;
+}
+
+.following-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.following-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.following-user {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.following-user:last-child {
+    border-bottom: none;
+}
+
+.following-username {
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+}
+
+.following-username:hover {
+    color: #007bff;
+}
+
+.following-posts {
+    flex: 1;
+    margin-top: 0;
+}
+
+.following-posts .post:first-child {
+    margin-top: 0;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.followers-count,
+.following-count,
+.total-posts,
+.total-likes {
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.post-comment {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+
+}
+.post-comment:last-child {
+    border-bottom: none;
+}
+
+.post-comment-user {
+    font-weight: 500;
+    color: #333;
+}
+
+.post-comments-list {
+    margin-left: 10px;
+}
+
+.post-comments-toggle {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.comments-toggle-btn {
+    padding: 0;
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.comments-toggle-btn:hover {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.post-comments {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.no-comments {
+    font-style: italic;
+    color: #999;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.post-comment-timestamp {
+    font-size: 12px;
+    color: #666;
+}

@@ -1,7 +1,8 @@
 {% extends "network/layout.html" %}
+{% load humanize %}
 
 {% block body %}
-    <h1>All Posts</h1>
+    <div class="container">
     {% if user.is_authenticated %}
         <form action="{% url 'create_post' %}" method="post">
             {% csrf_token %}
@@ -11,19 +12,89 @@
             <input class="btn btn-primary" type="submit" value="Post">
         </form>
     {% endif %}
+    <h1>All Posts</h1>
     <div class="all-posts">
         {% for post in posts %}
             <div class="post">
                 <div class="post-user">
-                    <span class="post-username">{{ post.user.username }}</span>
+                    <a href="{% url 'view_profile' post.user.username %}"><span class="post-username">{{ post.user.username }}</span></a>
                 </div>
                 <div class="post-content">
                     <p>{{ post.content }}</p>
                 </div>
                 <div class="post-footer">
-                    <span class="post-timestamp">{{ post.timestamp }}</span>
+                    <div class="post-actions">
+                        <span class="post-likes" id="likes-count-{{ post.id }}">{{ post.get_likes_count }} likes</span>
+                        {% if user.is_authenticated %}
+                            {% if user in post.likes.all %}
+                                <button class="btn btn-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Unlike</button>
+                            {% else %}
+                                <button class="btn btn-outline-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Like</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <span class="post-timestamp">{{ post.timestamp|naturaltime }}</span>
+                </div>
+                <div class="post-comments-toggle">
+                    <button class="btn btn-link btn-sm comments-toggle-btn" onclick="toggleComments('{{ post.id }}')" id="comments-toggle-{{ post.id }}">
+                        <span id="comments-count-{{ post.id }}">{{ post.get_comments_count }}</span> comment{{ post.get_comments_count|pluralize }}
+                    </button>
+                </div>
+            </div>
+            <div class="post-comments" id="comments-{{ post.id }}" style="display: none;">
+                <div class="post-comments-list">
+                  {% for comment in post.post_comments.all %}
+                        <div class="post-comment">
+                            <span class="post-comment-user"><a href="{% url 'view_profile' comment.user.username %}"><span class="post-username">{{ comment.user.username }}</span></a></span>
+                            <span class="post-comment-content">{{ comment.content }}</span>
+                            <span class="post-comment-timestamp">{{ comment.timestamp|naturaltime }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="no-comments">No comments yet.</p>
+                    {% endfor %}
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'comment_post' post.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" name="content" placeholder="Add a comment"></textarea>
+                        </div>
+                        <input class="btn btn-primary btn-sm" type="submit" value="Comment">
+                    </form>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
+    
+    <script>
+        function toggleComments(postId) {
+            const commentsDiv = document.getElementById(`comments-${postId}`);
+            const toggleBtn = document.getElementById(`comments-toggle-${postId}`);
+            
+            if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                commentsDiv.style.display = 'block';
+            } else {
+                commentsDiv.style.display = 'none';
+            }
+        }
+    </script>
 {% endblock %}

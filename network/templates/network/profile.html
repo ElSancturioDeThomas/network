@@ -1,0 +1,365 @@
+{% extends "network/layout.html" %}
+{% load humanize %}
+
+{% block body %}
+    <div class="following-container">
+        <h1>Profile</h1>
+        <div class="following-layout">
+            <div class="following-sidebar">
+                <h3 data-profile-user-id="{{ profile_user.id }}">{{ profile_user.username }}</h3>
+                {% if user.is_authenticated and user != profile_user %}
+                    {% if user in profile_user.followers.all %}
+                        <button class="btn btn-danger btn-sm follow-btn" data-user-id="{{ profile_user.id }}" data-username="{{ profile_user.username }}" id="follow-btn-{{ profile_user.id }}">Unfollow</button>
+                    {% else %}
+                        <button class="btn btn-primary btn-sm follow-btn" data-user-id="{{ profile_user.id }}" data-username="{{ profile_user.username }}" id="follow-btn-{{ profile_user.id }}">Follow</button>
+                    {% endif %}
+                {% endif %}
+                <div class="profile-info">
+                    <div class="followers-count" id="followers-count">Followers: {{ profile_user.get_followers_count }}</div>
+                    <div class="following-count">Following: {{ profile_user.get_following_count }}</div>
+                    <div class="total-posts" id="total-posts-count">Total posts: {{ profile_user.total_posts }}</div>
+                    <div class="total-likes" id="total-likes-count">Likes given: {{ profile_user.get_total_likes }}</div>
+                </div>
+            </div>
+            <div class="following-posts">
+                <div class="all-posts">
+                    {% for post in posts %}
+                        <div class="post" id="post-{{ post.id }}">
+                            <div class="post-header">
+                                {% if user.is_authenticated and user == profile_user %}
+                                    <h6 class="you-wrote">You wrote:</h6>
+                                    <div class="post-actions">
+                                        <button onclick="editPost('{{ post.id }}')" class="btn btn-primary btn-sm" id="edit-btn-{{ post.id }}">Edit</button>
+                                        <button onclick="savePost('{{ post.id }}')" class="btn btn-success btn-sm" id="save-btn-{{ post.id }}" style="display: none;">Save</button>
+                                        <button onclick="cancelEdit('{{ post.id }}')" class="btn btn-secondary btn-sm" id="cancel-btn-{{ post.id }}" style="display: none;">Cancel</button>
+                                        <button onclick="deletePost('{{ post.id }}')" class="btn btn-danger btn-sm" id="delete-btn-{{ post.id }}">Delete</button>
+                                    </div>
+                                {% else %}
+                                    <h6 class="you-wrote">{{ profile_user.username }} wrote:</h6>
+                                {% endif %}
+                            </div>
+                            <div class="post-content" id="post-content-{{ post.id }}">
+                                <p id="post-text-{{ post.id }}">{{ post.content }}</p>
+                                <textarea id="post-edit-{{ post.id }}" class="form-control" style="display: none;">{{ post.content }}</textarea>
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-actions">
+                                    <span class="post-likes" id="likes-count-{{ post.id }}">{{ post.get_likes_count }} likes</span>
+                                    {% if user.is_authenticated %}
+                                        {% if user in post.likes.all %}
+                                            <button class="btn btn-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Unlike</button>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Like</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <span class="post-timestamp">{{ post.timestamp|naturaltime }}</span>
+                            </div>
+                            <div class="post-comments-toggle">
+                                <button class="btn btn-link btn-sm comments-toggle-btn" onclick="toggleComments('{{ post.id }}')" id="comments-toggle-{{ post.id }}">
+                                    <span id="comments-count-{{ post.id }}">{{ post.get_comments_count }}</span> comment{{ post.get_comments_count|pluralize }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="post-comments" id="comments-{{ post.id }}" style="display: none;">
+                            <div class="post-comments-list">
+                                {% for comment in post.post_comments.all %}
+                                    <div class="post-comment">
+                                        <span class="post-comment-user"><a href="{% url 'view_profile' comment.user.username %}"><span class="post-username">{{ comment.user.username }}</span></a></span>
+                                        <span class="post-comment-content">{{ comment.content }}</span>
+                                        <span class="post-comment-timestamp">{{ comment.timestamp|naturaltime }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="no-comments">No comments yet.</p>
+                                {% endfor %}
+                                {% if user.is_authenticated %}
+                                <form action="{% url 'comment_post' post.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="content" placeholder="Add a comment"></textarea>
+                                    </div>
+                                    <input class="btn btn-primary btn-sm" type="submit" value="Comment">
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No posts yet.</p>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Store original content for cancel functionality
+        const originalContents = {};
+        
+        function editPost(postId) {
+            const postText = document.getElementById(`post-text-${postId}`);
+            const postEdit = document.getElementById(`post-edit-${postId}`);
+            const editBtn = document.getElementById(`edit-btn-${postId}`);
+            const saveBtn = document.getElementById(`save-btn-${postId}`);
+            const cancelBtn = document.getElementById(`cancel-btn-${postId}`);
+            const deleteBtn = document.getElementById(`delete-btn-${postId}`);
+            
+            // Check if all elements exist
+            if (!postText || !postEdit || !editBtn || !saveBtn || !cancelBtn || !deleteBtn) {
+                console.error('Could not find all required elements for post:', postId);
+                return;
+            }
+            
+            // Store original content
+            originalContents[postId] = postText.textContent;
+            
+            // Hide text, show textarea
+            postText.style.display = 'none';
+            postEdit.style.display = 'block';
+            postEdit.value = originalContents[postId];
+            
+            // Show/hide buttons
+            if (editBtn) editBtn.style.display = 'none';
+            if (deleteBtn) deleteBtn.style.display = 'none';
+            if (saveBtn) {
+                saveBtn.removeAttribute('style');
+                saveBtn.style.display = 'inline-block';
+            }
+            if (cancelBtn) {
+                cancelBtn.removeAttribute('style');
+                cancelBtn.style.display = 'inline-block';
+            }
+            
+            // Focus on textarea
+            postEdit.focus();
+        }
+        
+        function cancelEdit(postId) {
+            const postText = document.getElementById(`post-text-${postId}`);
+            const postEdit = document.getElementById(`post-edit-${postId}`);
+            const editBtn = document.getElementById(`edit-btn-${postId}`);
+            const saveBtn = document.getElementById(`save-btn-${postId}`);
+            const cancelBtn = document.getElementById(`cancel-btn-${postId}`);
+            const deleteBtn = document.getElementById(`delete-btn-${postId}`);
+            
+            // Restore original content
+            postText.textContent = originalContents[postId];
+            
+            // Hide textarea, show text
+            postEdit.style.display = 'none';
+            postText.style.display = 'block';
+            
+            // Show/hide buttons
+            if (saveBtn) saveBtn.style.display = 'none';
+            if (cancelBtn) cancelBtn.style.display = 'none';
+            if (editBtn) editBtn.style.display = 'inline-block';
+            if (deleteBtn) deleteBtn.style.display = 'inline-block';
+        }
+        
+        function savePost(postId) {
+            const postText = document.getElementById(`post-text-${postId}`);
+            const postEdit = document.getElementById(`post-edit-${postId}`);
+            const editBtn = document.getElementById(`edit-btn-${postId}`);
+            const saveBtn = document.getElementById(`save-btn-${postId}`);
+            const cancelBtn = document.getElementById(`cancel-btn-${postId}`);
+            const deleteBtn = document.getElementById(`delete-btn-${postId}`);
+            
+            const newContent = postEdit.value.trim();
+            
+            if (!newContent) {
+                alert('Post content cannot be empty');
+                return;
+            }
+            
+            // Disable buttons during request
+            saveBtn.disabled = true;
+            cancelBtn.disabled = true;
+            
+            // Get CSRF token
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/edit_post/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: newContent
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update content
+                postText.textContent = data.content;
+                
+                // Hide textarea, show text
+                postEdit.style.display = 'none';
+                postText.style.display = 'block';
+                
+                // Show/hide buttons
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                deleteBtn.style.display = 'inline-block';
+                
+                saveBtn.disabled = false;
+                cancelBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the post. Please try again.');
+                saveBtn.disabled = false;
+                cancelBtn.disabled = false;
+            });
+        }
+        
+        function deletePost(postId) {
+            // Show confirmation dialog
+            if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                return;
+            }
+            
+            const deleteBtn = document.getElementById(`delete-btn-${postId}`);
+            deleteBtn.disabled = true;
+            
+            // Get CSRF token
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/delete_post/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update total posts count if available
+                if (data.total_posts !== undefined) {
+                    const totalPostsElement = document.getElementById('total-posts-count');
+                    if (totalPostsElement) {
+                        totalPostsElement.textContent = `Total posts: ${data.total_posts}`;
+                    }
+                }
+                
+                // Update total likes count if available
+                if (data.total_likes !== undefined) {
+                    const totalLikesElement = document.getElementById('total-likes-count');
+                    if (totalLikesElement) {
+                        totalLikesElement.textContent = `Likes given: ${data.total_likes}`;
+                    }
+                }
+                
+                // Remove the post from the DOM
+                const postElement = document.getElementById(`post-${postId}`) || 
+                                   deleteBtn.closest('.post');
+                if (postElement) {
+                    postElement.remove();
+                } else {
+                    // If we can't find the element, reload the page
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the post. Please try again.');
+                deleteBtn.disabled = false;
+            });
+        }
+        
+        function followUser(userId, username) {
+            const followBtn = document.getElementById(`follow-btn-${userId}`);
+            const followersCountElement = document.getElementById('followers-count');
+            
+            followBtn.disabled = true;
+            
+            // Get CSRF token
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/follow_user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update button state
+                if (data.following) {
+                    followBtn.textContent = 'Unfollow';
+                    followBtn.className = 'btn btn-danger btn-sm follow-btn';
+                } else {
+                    followBtn.textContent = 'Follow';
+                    followBtn.className = 'btn btn-primary btn-sm follow-btn';
+                }
+                
+                // Update followers count
+                if (followersCountElement && data.followers_count !== undefined) {
+                    followersCountElement.textContent = `Followers: ${data.followers_count}`;
+                }
+                
+                followBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                followBtn.disabled = false;
+            });
+        }
+        
+        // Add event listeners to follow/unfollow buttons on profile page
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.follow-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const username = this.getAttribute('data-username');
+                    followUser(userId, username);
+                });
+            });
+        });
+        
+        function toggleComments(postId) {
+            const commentsDiv = document.getElementById(`comments-${postId}`);
+            
+            if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                commentsDiv.style.display = 'block';
+            } else {
+                commentsDiv.style.display = 'none';
+            }
+        }
+    </script>
+{% endblock %}

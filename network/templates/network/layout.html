@@ -4,6 +4,7 @@
 <html lang="en">
     <head>
         <title>{% block title %}Social Network{% endblock %}</title>
+        <meta name="csrf-token" content="{{ csrf_token }}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
     </head>
@@ -16,7 +17,7 @@
               <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><strong>{{ user.username }}</strong></a>
+                        <a class="nav-link" href="{% url 'view_profile' user.username %}"><strong>{{ user.username }}</strong></a>
                     </li>
                 {% endif %}
                 <li class="nav-item">
@@ -24,7 +25,7 @@
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Following</a>
+                        <a class="nav-link" href="{% url 'view_following' %}">Following</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
@@ -45,5 +46,92 @@
             {% block body %}
             {% endblock %}
         </div>
+        
+        <script>
+            // Function to get CSRF token from cookie
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            function likePost(postId) {
+                const button = document.getElementById(`like-btn-${postId}`);
+                const likesCount = document.getElementById(`likes-count-${postId}`);
+                
+                if (!button || !likesCount) {
+                    console.error('Like button or count element not found');
+                    return;
+                }
+                
+                button.disabled = true;
+                
+                const csrftoken = getCookie('csrftoken');
+                
+                fetch(`/like_post/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    likesCount.textContent = `${data.likes_count} likes`;
+                    
+                    if (data.liked) {
+                        button.textContent = 'Unlike';
+                        button.className = 'btn btn-primary btn-sm like-btn';
+                    } else {
+                        button.textContent = 'Like';
+                        button.className = 'btn btn-outline-primary btn-sm like-btn';
+                    }
+                    
+                    // Update total likes count on profile page if available
+                    if (data.post_author_total_likes !== undefined && data.post_author_id !== undefined) {
+                        const totalLikesElement = document.getElementById('total-likes-count');
+                        const profileHeader = document.querySelector('.following-sidebar h3[data-profile-user-id]');
+                        
+                        if (totalLikesElement && profileHeader) {
+                            const profileUserId = parseInt(profileHeader.getAttribute('data-profile-user-id'));
+                            // Only update if we're viewing the post author's profile
+                            if (profileUserId === data.post_author_id) {
+                                totalLikesElement.textContent = `Likes given: ${data.post_author_total_likes}`;
+                            }
+                        }
+                    }
+                    
+                    button.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    button.disabled = false;
+                    alert('An error occurred. Please try again.');
+                });
+            }
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.like-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const postId = this.getAttribute('data-post-id');
+                        likePost(postId);
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

@@ -1,0 +1,179 @@
+{% extends "network/layout.html" %}
+{% load humanize %}
+
+{% block body %}
+    <div class="following-container">
+        <h1>Following</h1>
+        <div class="following-layout">
+            <div class="following-sidebar">
+                <h3>Following</h3>
+                <div class="following-list">
+                    {% for user in following %}
+                        <div class="following-user">
+                            <a href="{% url 'view_profile' user.username %}"><span class="following-username">{{ user.username }}</span></a>
+                        </div>
+                    {% empty %}
+                        <p>You're not following anyone yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="following-posts">
+                    {% for post in posts %}
+                        <div class="post" id="post-{{ post.id }}" data-user-id="{{ post.user.id }}">
+                            <div class="post-header">
+                                <div class="post-user">
+                                    <a href="{% url 'view_profile' post.user.username %}"><span class="post-username">{{ post.user.username }}</span></a>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="btn btn-danger btn-sm unfollow-btn" data-user-id="{{ post.user.id }}" data-username="{{ post.user.username }}" id="unfollow-btn-{{ post.id }}">Unfollow</button>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                <p>{{ post.content }}</p>
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-actions">
+                                    <span class="post-likes" id="likes-count-{{ post.id }}">{{ post.get_likes_count }} likes</span>
+                                    {% if user.is_authenticated %}
+                                        {% if user in post.likes.all %}
+                                            <button class="btn btn-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Unlike</button>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-sm like-btn" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">Like</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <span class="post-timestamp">{{ post.timestamp|naturaltime }}</span>
+                            </div>
+                            <div class="post-comments-toggle">
+                                <button class="btn btn-link btn-sm comments-toggle-btn" onclick="toggleComments('{{ post.id }}')" id="comments-toggle-{{ post.id }}">
+                                    <span id="comments-count-{{ post.id }}">{{ post.get_comments_count }}</span> comment{{ post.get_comments_count|pluralize }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="post-comments" id="comments-{{ post.id }}" style="display: none;">
+                            <div class="post-comments-list">
+                                {% for comment in post.post_comments.all %}
+                                    <div class="post-comment">
+                                        <span class="post-comment-user"><a href="{% url 'view_profile' comment.user.username %}"><span class="post-username">{{ comment.user.username }}</span></a></span>
+                                        <span class="post-comment-content">{{ comment.content }}</span>
+                                        <span class="post-comment-timestamp">{{ comment.timestamp|naturaltime }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="no-comments">No comments yet.</p>
+                                {% endfor %}
+                                {% if user.is_authenticated %}
+                                <form action="{% url 'comment_post' post.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="content" placeholder="Add a comment"></textarea>
+                                    </div>
+                                    <input class="btn btn-primary btn-sm" type="submit" value="Comment">
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No posts from users you follow yet.</p>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function unfollowUser(userId, username, buttonElement) {
+            if (!confirm(`Are you sure you want to unfollow ${username}?`)) {
+                return;
+            }
+            
+            // Disable all unfollow buttons for this user
+            const allUnfollowButtons = document.querySelectorAll(`.unfollow-btn[data-user-id="${userId}"]`);
+            allUnfollowButtons.forEach(btn => btn.disabled = true);
+            
+            // Get CSRF token
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/follow_user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Remove all posts from this user
+                const postsToRemove = document.querySelectorAll(`.post[data-user-id="${userId}"]`);
+                postsToRemove.forEach(postElement => {
+                    postElement.remove();
+                });
+                
+                // Also remove from sidebar if present
+                const sidebarUser = document.querySelector(`.following-user a[href*="${username}"]`);
+                if (sidebarUser) {
+                    sidebarUser.closest('.following-user').remove();
+                }
+                
+                // Check if there are no more posts
+                const remainingPosts = document.querySelectorAll('.following-posts .post');
+                if (remainingPosts.length === 0) {
+                    const postsContainer = document.querySelector('.following-posts .all-posts');
+                    if (postsContainer) {
+                        postsContainer.innerHTML = '<p>No posts from users you follow yet.</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while unfollowing. Please try again.');
+                // Re-enable all unfollow buttons for this user
+                const allUnfollowButtons = document.querySelectorAll(`.unfollow-btn[data-user-id="${userId}"]`);
+                allUnfollowButtons.forEach(btn => btn.disabled = false);
+            });
+        }
+        
+        // Add event listeners to all unfollow buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.unfollow-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const username = this.getAttribute('data-username');
+                    unfollowUser(userId, username, this);
+                });
+            });
+        });
+        
+        function toggleComments(postId) {
+            const commentsDiv = document.getElementById(`comments-${postId}`);
+            
+            if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                commentsDiv.style.display = 'block';
+            } else {
+                commentsDiv.style.display = 'none';
+            }
+        }
+    </script>
+{% endblock %}
